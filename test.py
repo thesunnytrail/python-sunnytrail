@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
+import mox
 import unittest
 import sunnytrail
 
 class ApiTestCase(unittest.TestCase):
-  pass
+  def setUp(self):
+    self.mox = mox.Mox()
 
-class SunnyTrailTest(ApiTestCase:
+  def tearDown(self):
+    self.mox.UnsetStubs()
+
+class SunnyTrailTest(ApiTestCase):
   pass
 
 if __name__ == '__main__':
