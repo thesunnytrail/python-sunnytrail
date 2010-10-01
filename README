@@ -1,0 +1,13 @@
+
+Python client library for Sunnytrail
+====================================
+
+The fastest and easiest way to integrate.
+
+Requirements
+------------
+
+Python 2.5 
+
+For testing you also need pymox.
+
