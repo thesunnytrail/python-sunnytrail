@@ -6,6 +6,8 @@ import sys
 import urllib
 import simplejson
 
+from time import time
+
 class SunnytrailException(Exception): 
   """ Generic class for Sunnytrail related exceptions """
   pass
@@ -21,8 +23,42 @@ class Sunnytrail(object):
     print event.to_json()
     
 class Event(object):
+  def __init__(self, id, name, email, action, plan):
+    pass 
+
   def to_json(self):
     pass
+
+class Plan(object):
+  def __init__(self, name, price, recurring = None):
+    self._name = name
+    self._price = float(price)
+    self._recurring = None if recurring is None else int(recurring)
+
+  @property
+  def name(self): return self._name
+
+  @property
+  def price(self): return self._price
+
+  @property 
+  def recurring(self): return self._recurring
+
+  @property
+  def is_recurring(self): return self._recurring is not None
+
+  def to_hash(self):
+    ret = {
+      'name': self._name,
+      'price': self._price
+    }
+    if self.is_recurring:
+      ret['recurring'] = self._recurring
+
+    return ret
+
+  def to_json(self):
+    return simplejson.dumps(self.to_hash())
 
 class SignupEvent(Event):
   def __init__(self, name, email, plan):
