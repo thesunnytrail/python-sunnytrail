@@ -7,7 +7,7 @@ import sys
 import urllib
 import simplejson
 
-from urllib import FancyURLopener
+from urllib import FancyURLopener, urlencode
 from time import time
 
 class SunnytrailOpener(FancyURLopener):
@@ -15,6 +15,10 @@ class SunnytrailOpener(FancyURLopener):
 
 class SunnytrailException(Exception): 
   """ Generic class for Sunnytrail related exceptions """
+  pass
+
+class ServiceUnavailable(SunnytrailException):
+  """ The Sunnytrail message collector is not available """
   pass
 
 class Sunnytrail(object):
@@ -29,18 +33,18 @@ class Sunnytrail(object):
 
   def send(self, event):
     """ Send an event to the API """
-    r = self.urlopen(self._messages_url, {'message': event.to_json()})
-    if r.code == 201:
-      return True
+    try:
+      r = self.urlopen(self._messages_url, 
+        urlencode({'message': event.to_json()}))
+      r.close()
 
-    if r.code == 403:
-      # XXX read response and extract specific error message
-      raise SunnytrailException('Invalid request')
+    except IOError, e:
+      _, code, _, _ = e.args
+      if code == 403:
+        raise SunnytrailException('Invalid request')
 
-    if r.code == 504:
-      raise SunnytrailException('Service unavailable')
-
-    r.close()
+      if code == 504:
+        raise ServiceUnavailable()
  
 class Event(object):
   def __init__(self, id, name, email, action, plan):

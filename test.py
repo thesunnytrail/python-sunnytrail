@@ -5,6 +5,7 @@ import sunnytrail
 import simplejson
 
 from time import time
+from urlparse import parse_qs
 
 class PlanTest(unittest.TestCase):
   def test_create_plan(self):
@@ -81,13 +82,21 @@ class EventTest(unittest.TestCase):
 class DebugOpener(object):
   def __init__(self):
     self._url = self._data = None
+    self._exception = None
+
+  def should_raise(self, e):
+    self._exception = e
 
   def open(self, url, data):
+    if self._exception is not None:
+      raise self._exception
+
     self._url, self._data = url, data
 
     class EmptyResponse(object):
       code = 201
       def read(self): return ''
+      def close(self): pass
 
     return EmptyResponse()
 
@@ -99,15 +108,24 @@ class SunnytrailTest(unittest.TestCase):
     self.opener = DebugOpener()
     self.client.urlopen = self.opener.open
 
+    self.cancel_event = sunnytrail.CancelEvent('id', 'name', 'email')
+
   def test_send_signup_event(self):
     self.client.send(sunnytrail.SignupEvent('id', 'name', \
       'email', sunnytrail.Plan('test')))
 
     assert 'dummykey' in self.opener._url
-    assert 'message' in self.opener._data
 
-    data = simplejson.loads(self.opener._data['message'])
+    data = simplejson.loads(
+      parse_qs(self.opener._data)['message'][0])
     assert 'id' in data
+
+  def test_403_error(self):
+    self.opener.should_raise(
+      IOError('http-error', 403, None, None))
+
+    self.assertRaises(sunnytrail.SunnytrailException, 
+      self.client.send, self.cancel_event)
 
 if __name__ == '__main__':
   unittest.main()
