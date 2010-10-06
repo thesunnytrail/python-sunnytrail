@@ -18,7 +18,7 @@ class SunnytrailException(Exception):
   pass
 
 class Sunnytrail(object):
-  opener = SunnytrailOpener
+  urlopen = SunnytrailOpener().open
 
   def __init__(self, key, base_url='api.thesunnytrail.com', use_ssl=True):
     self._key = key
@@ -29,9 +29,18 @@ class Sunnytrail(object):
 
   def send(self, event):
     """ Send an event to the API """
-    h = self.opener().open(self._messages_url, \
-      {'message': event.to_json()})
-    r = h.read()
+    r = self.urlopen(self._messages_url, {'message': event.to_json()})
+    if r.code == 201:
+      return True
+
+    if r.code == 403:
+      # XXX read response and extract specific error message
+      raise SunnytrailException('Invalid request')
+
+    if r.code == 504:
+      raise SunnytrailException('Service unavailable')
+
+    r.close()
  
 class Event(object):
   def __init__(self, id, name, email, action, plan):

@@ -2,6 +2,7 @@
 
 import unittest
 import sunnytrail
+import simplejson
 
 from time import time
 
@@ -83,7 +84,9 @@ class DebugOpener(object):
 
   def open(self, url, data):
     self._url, self._data = url, data
+
     class EmptyResponse(object):
+      code = 201
       def read(self): return ''
 
     return EmptyResponse()
@@ -92,13 +95,19 @@ class SunnytrailTest(unittest.TestCase):
 
   def setUp(self):
     self.client = sunnytrail.Sunnytrail('dummykey')
-    self.client.opener = DebugOpener
+
+    self.opener = DebugOpener()
+    self.client.urlopen = self.opener.open
 
   def test_send_signup_event(self):
     self.client.send(sunnytrail.SignupEvent('id', 'name', \
       'email', sunnytrail.Plan('test')))
 
-    # XXX check everything works as expected
+    assert 'dummykey' in self.opener._url
+    assert 'message' in self.opener._data
+
+    data = simplejson.loads(self.opener._data['message'])
+    assert 'id' in data
 
 if __name__ == '__main__':
   unittest.main()
