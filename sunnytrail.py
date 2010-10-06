@@ -7,22 +7,32 @@ import sys
 import urllib
 import simplejson
 
+from urllib import FancyURLopener
 from time import time
+
+class SunnytrailOpener(FancyURLopener):
+  version = 'Sunnytrail Python API Wrapper 1.0'
 
 class SunnytrailException(Exception): 
   """ Generic class for Sunnytrail related exceptions """
   pass
 
 class Sunnytrail(object):
+  opener = SunnytrailOpener
+
   def __init__(self, key, base_url='api.thesunnytrail.com', use_ssl=True):
-    self.key = key
-    self._base_url = ("https://%s" if use_ssl else "http://%s") % url
+    self._key = key
+    self._base_url = ("https://%s" if use_ssl else "http://%s") % base_url
+    self._messages_url = "%s/messages?%s" % \
+      (self._base_url, urllib.urlencode({'apikey': self._key}))
     self._use_ssl = use_ssl
 
-  def send_event(self, event):
+  def send(self, event):
     """ Send an event to the API """
-    print {'message': event.to_json()}
-    
+    h = self.opener().open(self._messages_url, \
+      {'message': event.to_json()})
+    r = h.read()
+ 
 class Event(object):
   def __init__(self, id, name, email, action, plan):
     self._id = id

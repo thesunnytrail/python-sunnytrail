@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import mox
 import unittest
 import sunnytrail
 
@@ -78,15 +77,28 @@ class EventTest(unittest.TestCase):
       '"plan": {}, "id": "id", "name": "name", "email": "email"}'
     self.assertEqual(actual, expected)
 
-class ApiTestCase(unittest.TestCase):
+class DebugOpener(object):
+  def __init__(self):
+    self._url = self._data = None
+
+  def open(self, url, data):
+    self._url, self._data = url, data
+    class EmptyResponse(object):
+      def read(self): return ''
+
+    return EmptyResponse()
+
+class SunnytrailTest(unittest.TestCase):
+
   def setUp(self):
-    self.mox = mox.Mox()
+    self.client = sunnytrail.Sunnytrail('dummykey')
+    self.client.opener = DebugOpener
 
-  def tearDown(self):
-    self.mox.UnsetStubs()
+  def test_send_signup_event(self):
+    self.client.send(sunnytrail.SignupEvent('id', 'name', \
+      'email', sunnytrail.Plan('test')))
 
-class SunnyTrailTest(ApiTestCase):
-  pass
+    # XXX check everything works as expected
 
 if __name__ == '__main__':
   unittest.main()
