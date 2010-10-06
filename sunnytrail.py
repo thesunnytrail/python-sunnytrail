@@ -1,6 +1,7 @@
 """ Sunnytrail client library.
 
-The easiest and fastest way to integrate. This file can also be used as CLI tool if you wish to play with the API."""
+The easiest and fastest way to integrate. This file can also 
+be used as CLI tool if you wish to play with the API."""
 
 import sys
 import urllib
@@ -20,17 +21,51 @@ class Sunnytrail(object):
 
   def send_event(self, event):
     """ Send an event to the API """
-    print event.to_json()
+    print {'message': event.to_json()}
     
 class Event(object):
   def __init__(self, id, name, email, action, plan):
-    pass 
+    self._id = id
+    self._name = name
+    self._email = email
+    self._action = action
+    self._plan = plan
+
+  def to_hash(self):
+    ret = {
+      'name': self._name,
+      'email': self._email,
+      'action': self._action.to_hash(),
+      'plan': self._plan.to_hash()
+    }
+    if self._id is not None:
+      ret['id'] = self._id
+
+    return ret
 
   def to_json(self):
-    pass
+    return simplejson.dumps(self.to_hash())
+
+class SignupEvent(Event):
+  def __init__(self, id, name, email, plan, created=None):
+    super(SignupEvent, self).__init__(id, name, \
+      email, SignupAction(created), plan)
+
+class PayEvent(Event):
+  def __init__(self, id, name, email, plan, created=None):
+    super(PayEvent, self).__init__(id, name, \
+      email, PayAction(created), plan)
+
+class CancelEvent(Event):
+  def __init__(self, id, name, email, created = None):
+    super(CancelEvent, self).__init__(id, \
+      name, email, CancelAction(created), EmptyPlan())
+
+class EmptyPlan(object):
+  def to_hash(self): return {}
 
 class Plan(object):
-  def __init__(self, name, price, recurring = None):
+  def __init__(self, name, price = 0, recurring = None):
     self._name = name
     self._price = float(price)
     self._recurring = None if recurring is None else int(recurring)
@@ -79,6 +114,18 @@ class Action(object):
       'name': self._name,
       'created':  self._created
     }
+
+class SignupAction(Action):
+  def __init__(self, created=None):
+    super(SignupAction, self).__init__('signup', created)
+
+class PayAction(Action):
+  def __init__(self, created=None):
+    super(PayAction, self).__init__('pay', created)
+
+class CancelAction(Action):
+  def __init__(self, created=None):
+    super(CancelAction, self).__init__('cancel', created)
 
 def main():
   pass

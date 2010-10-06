@@ -43,6 +43,41 @@ class ActionTest(unittest.TestCase):
   def test_create_action_with_invalid_name(self):
     self.assertRaises(ValueError, sunnytrail.Action, 'dummy-name')
 
+class EventTest(unittest.TestCase):
+  def test_create_free_signup_event(self):
+    actual = sunnytrail.SignupEvent('id', 'name', \
+      'email', sunnytrail.Plan('plan'), 123).to_json()
+
+    expected = '{"action": {"name": "signup", "created": 123}, '\
+      '"plan": {"price": 0.0, "name": "plan"}, "id": "id", '\
+      '"name": "name", "email": "email"}'
+    self.assertEquals(actual, expected)
+
+  def test_create_paied_plan_signup_event(self):
+    actual = sunnytrail.SignupEvent('id', 'name', \
+      'email', sunnytrail.Plan('plan', 49), 123).to_json()
+
+    expected = '{"action": {"name": "signup", "created": 123}, '\
+      '"plan": {"price": 49.0, "name": "plan"}, "id": "id", '\
+      '"name": "name", "email": "email"}'
+    self.assertEqual(actual, expected)
+
+  def test_create_payment_event(self):
+    actual = sunnytrail.PayEvent('id', 'name', \
+      'email', sunnytrail.Plan('plan', 49), 123).to_json()
+
+    expected = '{"action": {"name": "pay", "created": 123}, '\
+      '"plan": {"price": 49.0, "name": "plan"}, '\
+      '"id": "id", "name": "name", "email": "email"}'
+    self.assertEqual(actual, expected)
+
+  def test_create_cancel_event(self):
+    actual = sunnytrail.CancelEvent('id', 'name', 'email', 123).to_json()
+
+    expected = '{"action": {"name": "cancel", "created": 123}, '\
+      '"plan": {}, "id": "id", "name": "name", "email": "email"}'
+    self.assertEqual(actual, expected)
+
 class ApiTestCase(unittest.TestCase):
   def setUp(self):
     self.mox = mox.Mox()
