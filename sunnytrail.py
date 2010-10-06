@@ -60,6 +60,11 @@ class Plan(object):
 class Action(object):
   def __init__(self, name, created=None):
     created = created if created is not None else time()
+
+    if name not in ('signup', 'pay', 'cancel'):
+      raise ValueError('Invalid action name. '\
+        'Expected values: signup, pay or cancel')
+
     self._name = name
     self._created = int(created)
 

@@ -32,13 +32,16 @@ class PlanTest(unittest.TestCase):
 class ActionTest(unittest.TestCase):
   def test_create_action(self):
     now = int(time())
-    p = sunnytrail.Action('action-name')
+    p = sunnytrail.Action('signup')
 
     assert 'name' in p.to_hash()
     assert 'created' in p.to_hash()
 
-    self.assertEquals(p.name, 'action-name')
+    self.assertEquals(p.name, 'signup')
     self.assertTrue(p.created >= now)
+
+  def test_create_action_with_invalid_name(self):
+    self.assertRaises(ValueError, sunnytrail.Action, 'dummy-name')
 
 class ApiTestCase(unittest.TestCase):
   def setUp(self):
