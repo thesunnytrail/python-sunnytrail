@@ -79,7 +79,7 @@ class EventTest(unittest.TestCase):
       '"plan": {}, "id": "id", "name": "name", "email": "email"}'
     self.assertEqual(actual, expected)
 
-class DebugOpener(object):
+class TestOpener(object):
   def __init__(self):
     self._url = self._data = None
     self._exception = None
@@ -105,7 +105,7 @@ class SunnytrailTest(unittest.TestCase):
   def setUp(self):
     self.client = sunnytrail.Sunnytrail('dummykey')
 
-    self.opener = DebugOpener()
+    self.opener = TestOpener()
     self.client.urlopen = self.opener.open
 
     self.cancel_event = sunnytrail.CancelEvent('id', 'name', 'email')
