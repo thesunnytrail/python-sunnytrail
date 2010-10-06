@@ -4,6 +4,8 @@ import mox
 import unittest
 import sunnytrail
 
+from time import time
+
 class PlanTest(unittest.TestCase):
   def test_create_plan(self):
     p = sunnytrail.Plan('plan-name', 10, 30)
@@ -28,7 +30,15 @@ class PlanTest(unittest.TestCase):
     return all(map(lambda k: k in h, keys))
 
 class ActionTest(unittest.TestCase):
-  pass
+  def test_create_action(self):
+    now = int(time())
+    p = sunnytrail.Action('action-name')
+
+    assert 'name' in p.to_hash()
+    assert 'created' in p.to_hash()
+
+    self.assertEquals(p.name, 'action-name')
+    self.assertTrue(p.created >= now)
 
 class ApiTestCase(unittest.TestCase):
   def setUp(self):

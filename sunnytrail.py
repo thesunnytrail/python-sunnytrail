@@ -57,18 +57,23 @@ class Plan(object):
 
     return ret
 
-  def to_json(self):
-    return simplejson.dumps(self.to_hash())
+class Action(object):
+  def __init__(self, name, created=None):
+    created = created if created is not None else time()
+    self._name = name
+    self._created = int(created)
 
-class SignupEvent(Event):
-  def __init__(self, name, email, plan):
-    pass
+  @property
+  def name(self): return self._name
 
-class PayEvent(Event):
-  pass
+  @property
+  def created(self): return self._created
 
-class CancelEvent(Event):
-  pass
+  def to_hash(self):
+    return {
+      'name': self._name,
+      'created':  self._created
+    }
 
 def main():
   pass
