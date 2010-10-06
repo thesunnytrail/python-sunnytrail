@@ -127,6 +127,13 @@ class SunnytrailTest(unittest.TestCase):
     self.assertRaises(sunnytrail.SunnytrailException, 
       self.client.send, self.cancel_event)
 
+  def test_503_error(self):
+    self.opener.should_raise(
+      IOError('http-error', 503, None, None))
+
+    self.assertRaises(sunnytrail.ServiceUnavailable,
+      self.client.send, self.cancel_event)
+
 if __name__ == '__main__':
   unittest.main()
 

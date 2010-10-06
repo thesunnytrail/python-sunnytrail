@@ -43,8 +43,10 @@ class Sunnytrail(object):
       if code == 403:
         raise SunnytrailException('Invalid request')
 
-      if code == 504:
+      if code == 503:
         raise ServiceUnavailable()
+
+      raise
  
 class Event(object):
   def __init__(self, id, name, email, action, plan):
