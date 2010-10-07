@@ -6,6 +6,7 @@ be used as CLI tool if you wish to play with the API."""
 import sys
 import urllib
 import simplejson
+import logging
 
 from urllib import FancyURLopener, urlencode
 from time import time
@@ -39,11 +40,11 @@ class Sunnytrail(object):
       r.close()
 
     except IOError, e:
-      _, code, _, _ = e.args
-      if code == 403:
+      err, code = e.args[:2]
+      if err == 'http error' and code == 403:
         raise SunnytrailException('Invalid request')
 
-      if code == 503:
+      if err == 'http error' and code == 503:
         raise ServiceUnavailable()
 
       raise
@@ -152,9 +153,56 @@ class CancelAction(Action):
   def __init__(self, created=None):
     super(CancelAction, self).__init__('cancel', created)
 
-def main():
-  pass
+def main(args):
+  logging.basicConfig(level=logging.DEBUG)  
+  from optparse import OptionParser
+  
+  parser = OptionParser("%prog [--help] [--url] --key [--id] "\
+    "--name --email --action --plan --price")
+
+  parser.add_option('-k', '--key', help="Sunnytrail API key")
+  parser.add_option('-u', '--url', 
+    default='api.thesunnytrail.com', help="Sunnytrail API url")
+
+  parser.add_option('-i', '--id', help="Account internal ID")
+  parser.add_option('-n', '--name', help="Account user name")
+  parser.add_option('-e', '--email', help="Account user email")
+
+  parser.add_option('-a', '--action', help="Action: signup, pay or cancel")
+
+  parser.add_option('-p', '--plan', help='Plan name')
+  parser.add_option('', '--price', help='Plan price')
+
+  (opts, args) = parser.parse_args(args)
+
+  if any(map(lambda e: getattr(opts, e) is None, \
+      ('key', 'name', 'email', 'action', 'plan', 'price'))):
+    parser.error('A mandatory parameter is missing.')
+    return -1
+
+  if opts.action not in ('signup', 'pay', 'cancel'):
+    parser.error('Invalid action name. Valid values: signup, pay, cancel')
+    return -2
+
+  # perform a naive email address check
+  if '@' not in opts.email:
+    parser.error('Please specify a valid email address.')
+    return -3
+
+  s = Sunnytrail(opts.key)
+  try:
+    s.send(Event(opts.id, opts.name, opts.email, 
+      Action(opts.action), Plan(opts.plan, opts.price))) 
+
+  except SunnytrailException, e:
+    logging.exception(e)
+    return -4
+
+  except Exception, e:
+    logging.exception(e)
+    return -5
 
 if __name__ == '__main__':
-  sys.exit(main())
+  sys.exit(main(sys.argv))
+
 
