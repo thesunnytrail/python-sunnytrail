@@ -15,6 +15,7 @@ setup(
   url='http://www.thesunnytrail.com/',
   py_modules=['sunnytrail'],
   scripts=['sunnytrail'],
+  test_suite='test',
   classifiers=[
     'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
