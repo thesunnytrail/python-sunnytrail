@@ -7,7 +7,7 @@ except ImportError:
   pass
 
 setup(
-  name='python-sunnytrail',
+  name='sunnytrail',
   version='0.1',
   description='Python Wrapper for the Sunnytrail API',
   author='Sunnytrail Team',
