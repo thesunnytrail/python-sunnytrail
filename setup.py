@@ -13,6 +13,7 @@ setup(
   author='Sunnytrail Team',
   url='http://www.thesunnytrail.com/',
   py_modules=['sunnytrail'],
+  scripts=['sunnytrail'],
   classifiers=[
     'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
