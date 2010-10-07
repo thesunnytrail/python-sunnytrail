@@ -7,7 +7,23 @@ The fastest and easiest way to integrate.
 Requirements
 ------------
 
-Python 2.5 
+Python 2.5
+
+Command line interface
+----------------------
+
+** Signup for a free plan
+
+$ ./sunnytrail --key=YOUR-KEY --name=Username --email=user@example.com --action=signup --plan="Free Trial" --price=0
+
+** Upgrade to a paied plan
+
+$ ./sunnytrail --key=YOUR-KEY --name=Username --email=user@example.com --action=signup --plan="Basic" --price=9.99
+
+** Cancel account
+
+$ ./sunnytrail --key=YOUR-KEY --name=Username --email=user@example.com --action=cancel
+
 
 
 

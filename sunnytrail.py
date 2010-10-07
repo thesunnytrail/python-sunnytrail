@@ -181,7 +181,11 @@ def main(args):
   (opts, args) = parser.parse_args(args)
 
   if any(map(lambda e: getattr(opts, e) is None, \
-      ('key', 'name', 'email', 'action', 'plan', 'price'))):
+      ('key', 'name', 'email', 'action'))):
+    parser.error('A mandatory parameter is missing.')
+    return -1
+
+  if opts.action != 'cancel' and (opts.plan is None or opts.price is None):
     parser.error('A mandatory parameter is missing.')
     return -1
 
@@ -196,8 +200,12 @@ def main(args):
 
   s = Sunnytrail(opts.key)
   try:
-    s.send(Event(opts.id, opts.name, opts.email, 
-      Action(opts.action), Plan(opts.plan, opts.price))) 
+    if opts.action == 'cancel':
+      s.send(CancelEvent(opts.id, opts.name, opts.email))
+
+    else:
+      s.send(Event(opts.id, opts.name, opts.email, 
+        Action(opts.action), Plan(opts.plan, opts.price))) 
 
   except SunnytrailException, e:
     logging.exception(e)
