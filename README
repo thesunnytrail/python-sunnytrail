@@ -9,6 +9,26 @@ Requirements
 
 Python 2.5
 
+How to install
+--------------
+
+** First of all ensure that all tests pass on your system
+
+  $ python setup.py test
+
+** Install in the global or active environment
+
+  $ python setup.py install
+
+How to send events
+------------------
+
+  client = sunnytrail.Sunnytrail('YOUR-KEY')
+
+  client.send(sunnytrail.SignupEvent('id', 'name', 'email', sunnytrail.Plan('name', 'price'))
+
+  etc. -- check the tests for more usage examples
+
 Command line interface
 ----------------------
 
