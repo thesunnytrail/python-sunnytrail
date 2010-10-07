@@ -41,10 +41,15 @@ class Sunnytrail(object):
 
     except IOError, e:
       err, code = e.args[:2]
-      if err == 'http error' and code == 403:
+      if err != 'http error': raise
+
+      if code == 401:
+        raise SunnytrailException('Unauthorized. Invalid API key.')
+
+      elif code == 403:
         raise SunnytrailException('Invalid request')
 
-      if err == 'http error' and code == 503:
+      elif code == 503:
         raise ServiceUnavailable()
 
       raise
