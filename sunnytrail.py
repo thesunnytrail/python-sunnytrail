@@ -18,6 +18,14 @@ class SunnytrailException(Exception):
   """ Generic class for Sunnytrail related exceptions """
   pass
 
+class InvalidMessage(SunnytrailException):
+  """ Message validation failed on the server """
+  pass
+
+class InvalidAPIKey(SunnytrailException):
+  """ Invalid Sunnytrail API Key """
+  pass 
+
 class ServiceUnavailable(SunnytrailException):
   """ The Sunnytrail message collector is not available """
   pass
@@ -41,11 +49,11 @@ class Sunnytrail(object):
       if r.code == 403:
         try:
           data = simplejson.loads(r.read())
-          raise SunnytrailException('Invalid message: %s' % \
+          raise InvalidMessage('Invalid message: %s' % \
             ", ".join(map(lambda e: e[1], data['errors'])))
 
         except (TypeError, ValueError):
-          raise SunnytrailException('Invalid message')
+          raise InvalidMessage('Invalid message: error unknown')
 
       elif r.code != 201:
         raise SunnytrailException("Unexpected server "\
@@ -58,7 +66,7 @@ class Sunnytrail(object):
       if err != 'http error': raise
 
       if code == 401:
-        raise SunnytrailException('Unauthorized. Invalid API key.')
+        raise InvalidAPIKey()
 
       elif code == 503:
         raise ServiceUnavailable()

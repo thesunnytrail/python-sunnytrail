@@ -25,9 +25,35 @@ How to send events
 
   client = sunnytrail.Sunnytrail('YOUR-KEY')
 
-  client.send(sunnytrail.SignupEvent('id', 'name', 'email', sunnytrail.Plan('name', 'price'))
+  try:
+    client.send(sunnytrail.SignupEvent('id', 'name', 
+      'email', sunnytrail.Plan('name', 'price'))
+
+  except sunnytrail.ServiceUnavailable:
+    # add the message to a local queue and retry later
+
+  except sunnytrail.InvalidMessage:
+    # server side message validation failed. check data
+
+  except sunnytrail.InvalidAPIKey:
+    # check your API key. 
+
+  except sunnytrail.SunnytrailException:
+    # unexpected sunnytrail exception
 
   etc. -- check the tests for more usage examples
+
+Type of events
+--------------
+
+Signup: 
+  sunnytrail.SignupEvent
+
+Payment: 
+  sunnytrail.PayEvent
+
+Cancel: 
+  sunnytrail.CancelEvent
 
 Command line interface
 ----------------------
@@ -43,7 +69,5 @@ $ ./sunnytrail --key=YOUR-KEY --name=Username --email=user@example.com --action=
 ** Cancel account
 
 $ ./sunnytrail --key=YOUR-KEY --name=Username --email=user@example.com --action=cancel
-
-
 
 
