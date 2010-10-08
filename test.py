@@ -83,9 +83,13 @@ class TestOpener(object):
   def __init__(self):
     self._url = self._data = None
     self._exception = None
+    self._response = None
 
   def should_raise(self, e):
     self._exception = e
+
+  def should_respond(self, r):
+    self._response = r
 
   def open(self, url, data):
     if self._exception is not None:
@@ -98,7 +102,7 @@ class TestOpener(object):
       def read(self): return ''
       def close(self): pass
 
-    return EmptyResponse()
+    return self._response or EmptyResponse()
 
 class SunnytrailTest(unittest.TestCase):
 
@@ -121,10 +125,28 @@ class SunnytrailTest(unittest.TestCase):
     assert 'id' in data
 
   def test_403_error(self):
-    self.opener.should_raise(
-      IOError('http error', 403, None, None))
+    class InvalidMessage(object):
+      code = 403
+      def close(self): pass
+      def read(self):
+        return '{"message": "invalid message", "errors": '\
+          '[["message", "email should be valid"]]}'
+
+    self.opener.should_respond(InvalidMessage())
 
     self.assertRaises(sunnytrail.SunnytrailException, 
+      self.client.send, self.cancel_event)
+
+  def test_403_error_invalid_json_response(self):
+    class InvalidJSONResponse(object):
+      code = 403
+      def close(self): pass
+      def read(self):
+        return 'just a dummy string'
+
+    self.opener.should_respond(InvalidJSONResponse())
+
+    self.assertRaises(sunnytrail.SunnytrailException,
       self.client.send, self.cancel_event)
 
   def test_503_error(self):

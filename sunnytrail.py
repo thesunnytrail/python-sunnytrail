@@ -37,6 +37,20 @@ class Sunnytrail(object):
     try:
       r = self.urlopen(self._messages_url, 
         urlencode({'message': event.to_json()}))
+
+      if r.code == 403:
+        try:
+          data = simplejson.loads(r.read())
+          raise SunnytrailException('Invalid message: %s' % \
+            ", ".join(map(lambda e: e[1], data['errors'])))
+
+        except (TypeError, ValueError):
+          raise SunnytrailException('Invalid message')
+
+      elif r.code != 201:
+        raise SunnytrailException("Unexpected server "\
+          "response code: %s" % r.code)
+
       r.close()
 
     except IOError, e:
@@ -45,9 +59,6 @@ class Sunnytrail(object):
 
       if code == 401:
         raise SunnytrailException('Unauthorized. Invalid API key.')
-
-      elif code == 403:
-        raise SunnytrailException('Invalid request')
 
       elif code == 503:
         raise ServiceUnavailable()
@@ -208,7 +219,7 @@ def main(args):
         Action(opts.action), Plan(opts.plan, opts.price))) 
 
   except SunnytrailException, e:
-    logging.exception(e)
+    logging.error(e)
     return -4
 
   except Exception, e:
