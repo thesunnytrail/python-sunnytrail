@@ -55,7 +55,7 @@ class Sunnytrail(object):
         except (TypeError, ValueError):
           raise InvalidMessage('Invalid message: error unknown')
 
-      elif r.code != 201:
+      elif r.code != 202:
         raise SunnytrailException("Unexpected server "\
           "response code: %s" % r.code)
 

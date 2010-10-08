@@ -98,7 +98,7 @@ class TestOpener(object):
     self._url, self._data = url, data
 
     class EmptyResponse(object):
-      code = 201
+      code = 202
       def read(self): return ''
       def close(self): pass
 
