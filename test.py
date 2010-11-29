@@ -1,11 +1,65 @@
 #!/usr/bin/env python
 
+import sys, os, signal
 import unittest
 import sunnytrail
 import simplejson
+import socket
+import subprocess
+import urllib
 
-from time import time
-from urlparse import parse_qs
+from time import time, sleep
+
+try:
+  from urlparse import parse_qs # python 2.6 and newer
+except ImportError:
+  from cgi import parse_qs # python 2.5 
+
+def get_unused_port():
+  """ Vulnerable to race conditions but good enough for now"""
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  s.bind(('localhost', 0))
+  addr, port = s.getsockname()
+  s.close()
+  return port
+
+def wait_for_port(host, port):
+  s = socket.socket()
+  while True:
+    try:
+      s.connect((host, port))
+      s.close()
+      return
+
+    except socket.error:
+      sleep(0.1)
+
+class FunctionalTest(unittest.TestCase):    
+  def setUp(self):
+    self.process = None
+  
+  def tearDown(self):
+    if self.process:
+      os.kill(self.process.pid, signal.SIGTERM)
+      self.process.wait()
+      self.process = None
+
+  def serve(self, code, content = ''):
+    port = get_unused_port()
+    self.process = subprocess.Popen([
+        'python', 'http_serve.py',
+        '--port', str(port),
+        '--code', str(code),
+        '--content', str(content),
+    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    wait_for_port('localhost', port)
+    return 'localhost:%d' % port
+
+  def test_error(self):
+    hostport = self.serve(202)
+    
+    client = sunnytrail.Sunnytrail('key', hostport, use_ssl = False)
+    client.send(sunnytrail.CancelEvent('id', 'name', 'email'))
 
 class PlanTest(unittest.TestCase):
   def test_create_plan(self):
