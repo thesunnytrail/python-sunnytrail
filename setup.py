@@ -8,7 +8,7 @@ except ImportError:
 
 setup(
   name='sunnytrail',
-  version='0.1.0',
+  version='0.1.1',
   description='Python Wrapper for the Sunnytrail API',
   author='Sunnytrail Team',
   author_email='andrei@thesunnytrail.com',
