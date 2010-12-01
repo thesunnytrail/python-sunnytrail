@@ -8,7 +8,8 @@ import urllib
 import simplejson
 import logging
 
-from urllib import FancyURLopener, urlencode
+from _urllib import FancyURLopener, urlencode
+
 from time import time
 
 class SunnytrailOpener(FancyURLopener):
@@ -35,7 +36,11 @@ class Sunnytrail(object):
 
   def __init__(self, key, base_url='api.thesunnytrail.com', use_ssl=True):
     self._key = key
-    self._base_url = ("https://%s" if use_ssl else "http://%s") % base_url
+    if use_ssl:
+      self._base_url = "https://%s" % base_url
+    else:
+      self._base_url = "http://%s" % base_url
+      
     self._messages_url = "%s/messages?%s" % \
       (self._base_url, urllib.urlencode({'apikey': self._key}))
     self._use_ssl = use_ssl
@@ -118,7 +123,10 @@ class Plan(object):
   def __init__(self, name, price = 0, recurring = None):
     self._name = name
     self._price = float(price)
-    self._recurring = None if recurring is None else int(recurring)
+    if recurring is None:
+      self._recurring = None
+    else:
+      self._recurring = int(recurring)
 
   @property
   def name(self): return self._name
@@ -144,7 +152,8 @@ class Plan(object):
 
 class Action(object):
   def __init__(self, name, created=None):
-    created = created if created is not None else time()
+    if created is None:
+      created = time()
 
     if name not in ('signup', 'pay', 'cancel'):
       raise ValueError('Invalid action name. '\

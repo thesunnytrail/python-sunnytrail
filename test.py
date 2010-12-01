@@ -6,9 +6,17 @@ import sunnytrail
 import simplejson
 import socket
 import subprocess
-import urllib
+import _urllib as urllib
 
 from time import time, sleep
+
+try:
+  all
+except:
+  def all(seq):
+    for el in seq:
+      if not el: return False
+    return True
 
 try:
   from urlparse import parse_qs # python 2.6 and newer
