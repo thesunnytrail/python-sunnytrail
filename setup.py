@@ -13,7 +13,7 @@ setup(
   author='Sunnytrail Team',
   author_email='andrei@thesunnytrail.com',
   url='http://www.thesunnytrail.com/',
-  py_modules=['sunnytrail'],
+  py_modules=['sunnytrail', '_sunnytrail_urllib'],
   scripts=['sunnytrail'],
   test_suite='test',
   classifiers=[

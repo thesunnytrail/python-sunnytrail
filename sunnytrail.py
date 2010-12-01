@@ -8,7 +8,7 @@ import urllib
 import simplejson
 import logging
 
-from _urllib import FancyURLopener, urlencode
+from _sunnytrail_urllib import FancyURLopener, urlencode
 
 from time import time
 

@@ -1,5 +1,8 @@
 """Open an arbitrary URL.
 
+UPDATE: This is needed because urllib.py is not 
+the same accross python versions.
+
 See the following document for more info on URLs:
 "Names and Addresses, URIs, URLs, URNs, URCs", at
 http://www.w3.org/pub/WWW/Addressing/Overview.html

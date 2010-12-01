@@ -6,7 +6,8 @@ import sunnytrail
 import simplejson
 import socket
 import subprocess
-import _urllib as urllib
+
+import _sunnytrail_urllib as urllib
 
 from time import time, sleep
 
